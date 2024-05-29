@@ -1,6 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:hotel_app/screens/explore.dart';
+import 'package:hotel_app/screens/near.dart';
 import 'package:hotel_app/screens/setting.dart';
 import 'package:hotel_app/theme/color.dart';
 import 'package:hotel_app/utils/constant.dart';
@@ -26,14 +28,14 @@ class _RootAppState extends State<RootApp> with TickerProviderStateMixin {
       "icon": "assets/icons/search.svg",
       "page": Container(
         alignment: Alignment.center,
-        child: const Text("Explore"),
+        child: const ExploreScreen(),
       ),
     },
     {
       "icon": "assets/icons/pin-area.svg",
       "page": Container(
         alignment: Alignment.center,
-        child: const Text("Nearby"),
+        child: HotelListScreen(),
       ),
     },
     {
