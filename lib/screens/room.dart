@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hotel_app/theme/color.dart';
 
 class RoomPage extends StatefulWidget {
   const RoomPage({super.key});
@@ -14,7 +16,9 @@ class _RoomPageState extends State<RoomPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         actions: const [
           Icon(Icons.more_vert),
@@ -68,7 +72,8 @@ class _RoomPageState extends State<RoomPage> {
                   const SizedBox(height: 16),
                   const Row(
                     children: [
-                      Icon(Icons.star, color: Colors.yellow, size: 18),
+                      Icon(Icons.star,
+                          color: Color.fromARGB(255, 255, 206, 59), size: 18),
                       SizedBox(width: 4),
                       Text('4.5'),
                       SizedBox(width: 8),
@@ -87,10 +92,9 @@ class _RoomPageState extends State<RoomPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _offerItem('assets/icons/twin_bed.png', 'Twin Bed'),
+                      _offerItem('assets/icons/twinbed.png', 'Twin Bed'),
                       _offerItem('assets/icons/wifi.png', 'Wifi'),
                       _offerItem('assets/icons/parking.png', 'Parking'),
-                      _offerItem('assets/icons/pool.png', 'Pool'),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -111,7 +115,9 @@ class _RoomPageState extends State<RoomPage> {
                   const SizedBox(height: 32),
                   Center(
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        _showConfirmBooking();
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.amber,
                         padding: const EdgeInsets.symmetric(
@@ -126,6 +132,31 @@ class _RoomPageState extends State<RoomPage> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  _showConfirmBooking() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        message: const Text("Would you like to book this room?"),
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {},
+            child: const Text(
+              "Yes",
+              style:
+                  TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+            ),
+          )
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          child: const Text("No"),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
         ),
       ),
     );

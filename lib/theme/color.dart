@@ -6,7 +6,7 @@ class AppColor {
 
   static const mainColor = Color(0xFF000000);
   static const darker = Color(0xFF3E4249);
-  static const appBgColor = Color(0xFFF7F7F7);
+  static const appBgColor = Color.fromARGB(255, 247, 247, 247);
   static const appBarColor = Color(0xFFF7F7F7);
   static const bottomBarColor = Colors.white;
   static const inActiveColor = Colors.grey;

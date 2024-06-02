@@ -113,10 +113,9 @@ class _RootAppState extends State<RootApp> with TickerProviderStateMixin {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColor.shadowColor.withOpacity(0.1),
+            color: AppColor.shadowColor.withOpacity(0.3),
             blurRadius: 1,
             spreadRadius: 1,
-            offset: const Offset(0, 1),
           )
         ],
       ),
@@ -133,7 +132,7 @@ class _RootAppState extends State<RootApp> with TickerProviderStateMixin {
             (index) => BottomBarItem(
               _barItems[index]["icon"],
               isActive: _activeTabIndex == index,
-              activeColor: AppColor.primary,
+              activeColor: AppColor.darker,
               onTap: () => onPageChanged(index),
             ),
           ),

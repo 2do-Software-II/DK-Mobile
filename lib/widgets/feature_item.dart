@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
 import 'package:flutter/material.dart';
+import 'package:hotel_app/screens/room.dart';
 import 'package:hotel_app/theme/color.dart';
 import 'package:hotel_app/widgets/favorite_box.dart';
 import 'custom_image.dart';
@@ -11,7 +12,6 @@ class FeatureItem extends StatelessWidget {
     required this.data,
     this.width = 280,
     this.height = 300,
-    this.onTap,
     this.onTapFavorite,
   });
 
@@ -19,12 +19,16 @@ class FeatureItem extends StatelessWidget {
   final double width;
   final double height;
   final GestureTapCallback? onTapFavorite;
-  final GestureTapCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RoomPage()),
+        );
+      },
       child: Container(
         width: width,
         height: height,
@@ -84,40 +88,38 @@ class FeatureItem extends StatelessWidget {
 
   Widget _buildInfo() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              data["type"],
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColor.labelColor,
-                fontSize: 13,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                data["type"],
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AppColor.labelColor,
+                  fontSize: 13,
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 2,
-            ),
-            Text(
-              data["price"],
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColor.primary,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
+              Text(
+                data["price"],
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AppColor.primary,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         FavoriteBox(
           size: 16,
           onTap: onTapFavorite,
           isFavorited: data["is_favorited"],
-        )
+        ),
       ],
     );
   }

@@ -1,7 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:hotel_app/screens/explore.dart';
 import 'package:hotel_app/theme/color.dart';
 import 'package:hotel_app/utils/data.dart';
+import 'package:hotel_app/utils/data_service.dart';
 import 'package:hotel_app/widgets/feature_item.dart';
 import 'package:hotel_app/widgets/notification_box.dart';
 import 'package:hotel_app/widgets/city_item.dart';
@@ -15,6 +17,27 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // final DataService _dataService = DataService();
+  // List<dynamic> _featuredRooms = [];
+
+  @override
+  // void initState() {
+  //   super.initState();
+  //   _fetchFeaturedRooms();
+  // }
+
+  // Future<void> _fetchFeaturedRooms() async {
+  //   try {
+  //     final rooms = await _dataService.fetchFeaturedRooms();
+  //     setState(() {
+  //       _featuredRooms = rooms;
+  //     });
+  //   } catch (e) {
+  //     // Handle errors here
+  //     print(e);
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +71,7 @@ class _HomePageState extends State<HomePage> {
           width: 3,
         ),
         Text(
-          "Phnom Penh",
+          "Santa Cruz",
           style: TextStyle(
             color: AppColor.darker,
             fontSize: 13,
@@ -108,21 +131,30 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(
             height: 15,
           ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(15, 0, 15, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   "Recommended",
                   style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
                       color: AppColor.textColor),
                 ),
-                Text(
-                  "See all",
-                  style: TextStyle(fontSize: 14, color: AppColor.darker),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ExploreScreen()),
+                    );
+                  },
+                  child: const Text(
+                    "See all",
+                    style: TextStyle(fontSize: 14, color: AppColor.darker),
+                  ),
                 ),
               ],
             ),

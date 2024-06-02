@@ -7,7 +7,7 @@ class BottomBarItem extends StatelessWidget {
     this.icon, {
     super.key,
     this.onTap,
-    this.color = Colors.grey,
+    this.color = const Color.fromARGB(255, 52, 50, 50),
     this.activeColor = AppColor.primary,
     this.isActive = false,
   });
@@ -32,7 +32,8 @@ class BottomBarItem extends StatelessWidget {
             boxShadow: [
               if (isActive)
                 BoxShadow(
-                  color: AppColor.shadowColor.withOpacity(0.1),
+                  color:
+                      const Color.fromARGB(255, 214, 160, 0).withOpacity(0.5),
                   spreadRadius: 2,
                   blurRadius: 2,
                   offset: const Offset(0, 0), // changes position of shadow
@@ -42,7 +43,7 @@ class BottomBarItem extends StatelessWidget {
           child: SvgPicture.asset(
             icon,
             colorFilter: ColorFilter.mode(
-              isActive ? AppColor.primary : color,
+              isActive ? const Color.fromARGB(255, 223, 134, 0) : color,
               BlendMode.srcIn,
             ),
             width: 20,

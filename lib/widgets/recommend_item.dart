@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
 import 'package:flutter/material.dart';
+import 'package:hotel_app/screens/room.dart';
 import 'package:hotel_app/theme/color.dart';
 import 'custom_image.dart';
 
@@ -8,16 +9,19 @@ class RecommendItem extends StatelessWidget {
   const RecommendItem({
     super.key,
     required this.data,
-    this.onTap,
   });
 
   final data;
-  final GestureTapCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RoomPage()),
+        );
+      },
       child: Container(
         margin: const EdgeInsets.only(right: 10),
         padding: const EdgeInsets.all(10),
