@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hotel_app/theme/color.dart';
 
 class RoomPage extends StatefulWidget {
   const RoomPage({super.key});

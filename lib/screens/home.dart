@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hotel_app/screens/explore.dart';
 import 'package:hotel_app/theme/color.dart';
 import 'package:hotel_app/utils/data.dart';
-import 'package:hotel_app/utils/data_service.dart';
 import 'package:hotel_app/widgets/feature_item.dart';
 import 'package:hotel_app/widgets/notification_box.dart';
 import 'package:hotel_app/widgets/city_item.dart';
