@@ -214,4 +214,79 @@ class DataService {
       throw Exception(result.exception.toString());
     }
   }
+
+  Future<void> createBooking(
+    String date,
+    String time,
+    String paymentMethod,
+    String startDate,
+    String endDate,
+    String customerId,
+    String roomId,
+    String status,
+    double fullPayment,
+  ) async {
+    const String mutation = r'''
+    mutation CreateBooking(
+      $date: String!,
+      $time: String!,
+      $paymentMethod: String!,
+      $startDate: String!,
+      $endDate: String!,
+      $customerId: String!,
+      $roomId: String!,
+      $status: String!,
+      $fullPayment: Float!
+    ) {
+      createBooking(
+        createBookingDto: {
+          date: $date,
+          time: $time,
+          paymentMethod: $paymentMethod,
+          startDate: $startDate,
+          endDate: $endDate,
+          customer: $customerId,
+          room: $roomId,
+          status: $status,
+          fullPayment: $fullPayment
+        }
+      ) {
+        customer {
+          id
+        }
+        date
+        endDate
+        paymentMethod
+        room {
+          id
+        }
+        startDate
+        status
+        time
+        fullPayment
+      }
+    }
+  ''';
+
+    final MutationOptions options = MutationOptions(
+      document: gql(mutation),
+      variables: {
+        'date': date,
+        'time': time,
+        'paymentMethod': paymentMethod,
+        'startDate': startDate,
+        'endDate': endDate,
+        'customerId': customerId,
+        'roomId': roomId,
+        'status': status,
+        'fullPayment': fullPayment,
+      },
+    );
+
+    final QueryResult result = await _client.mutate(options);
+
+    if (result.hasException) {
+      throw Exception(result.exception.toString());
+    }
+  }
 }
