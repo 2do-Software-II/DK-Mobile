@@ -1,6 +1,6 @@
-// lib/utils/data_service.dart
-
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:hotel_app/utils/habitacion_class.dart';
+import 'package:hotel_app/utils/reserva_class.dart'; // Importa la clase Reserva
 
 class DataService {
   final GraphQLClient _client;
@@ -12,17 +12,23 @@ class DataService {
           cache: GraphQLCache(),
         );
 
-  Future<List<dynamic>> fetchAllRooms() async {
+  Future<List<Habitacion>> fetchAllRooms() async {
     const String query = r'''
       query MyQuery {
         getAllRooms {
-          description
           nroRoom
+          id
+          description
           nroPersons
-          type
+          nroBeds
           price
           size
           status
+          type
+          view
+          resources {
+            url
+          }
         }
       }
     ''';
@@ -34,53 +40,99 @@ class DataService {
       throw Exception(result.exception.toString());
     }
 
-    return result.data?['getAllRooms'] ?? [];
+    final List<dynamic> data = result.data?['getAllRooms'] ?? [];
+    return data.map((room) => Habitacion.fromJson(room)).toList();
   }
 
-  Future<List<dynamic>> fetchAllServices() async {
+  Future<List<Habitacion>> fetchAllRoomsRecommended(String userId) async {
     const String query = r'''
-      query MyQuery {
-        getAllServices {
+      query MyQuery($id: String!) {
+        getAllRoomsRecommended(id: $id) {
           description
           id
-          name
+          nroBeds
+          nroPersons
+          nroRoom
+          price
+          resources {
+            url
+          }
+          size
+          status
+          type
+          view
         }
       }
     ''';
 
-    final QueryOptions options = QueryOptions(document: gql(query));
+    final QueryOptions options = QueryOptions(
+      document: gql(query),
+      variables: {'id': userId},
+    );
+
     final QueryResult result = await _client.query(options);
 
     if (result.hasException) {
       throw Exception(result.exception.toString());
     }
 
-    return result.data?['getAllServices'] ?? [];
+    final List<dynamic> data = result.data?['getAllRoomsRecommended'] ?? [];
+    return data.map((room) => Habitacion.fromJson(room)).toList();
   }
 
-  Future<List<dynamic>> fetchAllBookings() async {
+  static const String updateRoomStatusMutation = """
+    mutation UpdateRoomStatus(\$id: ID!) {
+      updateRoom(updateRoomDto: {status: "Ocupado"}, id: \$id) {
+        id
+      }
+    }
+  """;
+
+  Future<void> updateRoomStatus(String roomId) async {
+    final MutationOptions options = MutationOptions(
+      document: gql(updateRoomStatusMutation),
+      variables: {
+        'id': roomId,
+      },
+    );
+
+    final QueryResult result = await _client.mutate(options);
+
+    if (result.hasException) {
+      throw Exception(result.exception.toString());
+    }
+  }
+
+  Future<List<Reserva>> fetchAllBookings(String userId) async {
     const String query = r'''
-      query MyQuery {
-        getAllBookings {
-          date
-          endDate
-          fullPayment
-          paymentMethod
-          prePaid
-          startDate
+      query MyQuery($id: String!) {
+        getAllBookingsBy(attr: "id", value: $id) {
+          customer {
+            id
+          }
           status
-          time
+          room {
+            type
+            description
+          }
+          startDate
+          endDate
         }
       }
     ''';
 
-    final QueryOptions options = QueryOptions(document: gql(query));
+    final QueryOptions options = QueryOptions(
+      document: gql(query),
+      variables: {'id': userId},
+    );
+
     final QueryResult result = await _client.query(options);
 
     if (result.hasException) {
       throw Exception(result.exception.toString());
     }
 
-    return result.data?['getAllBookings'] ?? [];
+    final List<dynamic> data = result.data?['getAllBookingsBy'] ?? [];
+    return data.map((booking) => Reserva.fromJson(booking)).toList();
   }
 }

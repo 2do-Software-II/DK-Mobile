@@ -1,24 +1,25 @@
-// ignore_for_file: prefer_typing_uninitialized_variables
-
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hotel_app/screens/room.dart';
 import 'package:hotel_app/theme/color.dart';
+import 'package:hotel_app/utils/habitacion_class.dart';
 import 'package:hotel_app/widgets/favorite_box.dart';
-import 'custom_image.dart';
 
 class FeatureItem extends StatelessWidget {
-  const FeatureItem({
-    super.key,
-    required this.data,
-    this.width = 280,
-    this.height = 300,
-    this.onTapFavorite,
-  });
-
-  final data;
+  final Habitacion habitacion;
   final double width;
   final double height;
   final GestureTapCallback? onTapFavorite;
+  final bool isFavorited;
+
+  const FeatureItem({
+    super.key,
+    required this.habitacion,
+    this.width = 280,
+    this.height = 280,
+    this.onTapFavorite,
+    this.isFavorited = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,8 @@ class FeatureItem extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const RoomPage()),
+          MaterialPageRoute(
+              builder: (context) => RoomPage(habitacion: habitacion)),
         );
       },
       child: Container(
@@ -42,7 +44,7 @@ class FeatureItem extends StatelessWidget {
               color: AppColor.shadowColor.withOpacity(0.1),
               spreadRadius: 1,
               blurRadius: 1,
-              offset: const Offset(1, 1), // changes position of shadow
+              offset: const Offset(1, 1),
             ),
           ],
         ),
@@ -51,19 +53,19 @@ class FeatureItem extends StatelessWidget {
           children: [
             _buildImage(),
             SizedBox(
-              height: height - 220, // Reducir el espacio del contenedor interno
-              child: Container(
-                width: width - 20,
-                padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildName(),
-                    const SizedBox(
-                      height: 2,
-                    ),
-                    _buildInfo(),
-                  ],
+              height: height - 200,
+              child: SingleChildScrollView(
+                // Añadir SingleChildScrollView para evitar overflow
+                child: Container(
+                  width: width - 20,
+                  padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildName(),
+                      _buildInfo(),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -75,7 +77,7 @@ class FeatureItem extends StatelessWidget {
 
   Widget _buildName() {
     return Text(
-      data["name"],
+      habitacion.type,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: const TextStyle(
@@ -94,7 +96,7 @@ class FeatureItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                data["type"],
+                habitacion.status,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
@@ -103,7 +105,7 @@ class FeatureItem extends StatelessWidget {
                 ),
               ),
               Text(
-                data["price"],
+                '\$${habitacion.price}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
@@ -118,18 +120,53 @@ class FeatureItem extends StatelessWidget {
         FavoriteBox(
           size: 16,
           onTap: onTapFavorite,
-          isFavorited: data["is_favorited"],
+          isFavorited: isFavorited,
         ),
       ],
     );
   }
 
   Widget _buildImage() {
-    return CustomImage(
-      data["image"],
+    if (habitacion.resources.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: habitacion.resources[0].url,
+        placeholder: (context, url) => const BlankImageWidget(),
+        errorWidget: (context, url, error) => const BlankImageWidget(),
+        imageBuilder: (context, imageProvider) => Container(
+          width: double.infinity,
+          height: 190,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            image: DecorationImage(
+              image: imageProvider,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      );
+    } else {
+      return const BlankImageWidget();
+    }
+  }
+}
+
+class BlankImageWidget extends StatelessWidget {
+  const BlankImageWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
       width: double.infinity,
       height: 190,
-      radius: 15,
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: const Icon(
+        Icons.image,
+        color: Colors.grey,
+        size: 50,
+      ),
     );
   }
 }

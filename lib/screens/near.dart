@@ -10,28 +10,28 @@ class HotelListScreen extends StatelessWidget {
       name: 'Hotel Cortez',
       rating: 4.5,
       reviews: 275,
-      location: 'Phnom Penh',
+      location: 'Santa Cruz',
       imageUrl: "assets/images/cortez.jpeg",
     ),
     Hotel(
       name: 'Catedral',
       rating: 4.5,
       reviews: 275,
-      location: 'Phnom Penh',
+      location: 'Santa Cruz',
       imageUrl: "assets/images/catedral-24-sept.jpeg",
     ),
     Hotel(
       name: 'Los Tajibos',
       rating: 4.5,
       reviews: 275,
-      location: 'Phnom Penh',
+      location: 'Santa Cruz',
       imageUrl: "assets/images/los-tajibos.webp",
     ),
     Hotel(
       name: 'Rey Palace',
       rating: 4.5,
       reviews: 275,
-      location: 'Phnom Penh',
+      location: 'Santa Cruz',
       imageUrl: "assets/images/rey-palace.jpeg",
     ),
   ];
@@ -42,7 +42,7 @@ class HotelListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nearby'),
+        title: const Text('Hoteles Cercanos'),
         actions: [
           IconButton(
             onPressed: () {},

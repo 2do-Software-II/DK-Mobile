@@ -1,8 +1,11 @@
+// ignore_for_file: avoid_print
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:hotel_app/screens/explore.dart';
 import 'package:hotel_app/theme/color.dart';
 import 'package:hotel_app/utils/data.dart';
+import 'package:hotel_app/utils/data_service.dart';
+import 'package:hotel_app/utils/habitacion_class.dart';
 import 'package:hotel_app/widgets/feature_item.dart';
 import 'package:hotel_app/widgets/notification_box.dart';
 import 'package:hotel_app/widgets/city_item.dart';
@@ -16,26 +19,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // final DataService _dataService = DataService();
-  // List<dynamic> _featuredRooms = [];
+  List<Habitacion> habitaciones = [];
+  List<Habitacion> habitacionesRecomendadas = [];
+  bool isLoading = true;
 
   @override
-  // void initState() {
-  //   super.initState();
-  //   _fetchFeaturedRooms();
-  // }
+  void initState() {
+    super.initState();
+    fetchHabitaciones();
+    fetchHabitacionesRecomendadas();
+  }
 
-  // Future<void> _fetchFeaturedRooms() async {
-  //   try {
-  //     final rooms = await _dataService.fetchFeaturedRooms();
-  //     setState(() {
-  //       _featuredRooms = rooms;
-  //     });
-  //   } catch (e) {
-  //     // Handle errors here
-  //     print(e);
-  //   }
-  // }
+  Future<void> fetchHabitaciones() async {
+    try {
+      final dataService = DataService();
+      final fetchedHabitaciones = await dataService.fetchAllRooms();
+      setState(() {
+        habitaciones = fetchedHabitaciones;
+        isLoading = false;
+      });
+    } catch (e) {
+      // Manejo de errores
+      print('Error fetching habitaciones: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> fetchHabitacionesRecomendadas() async {
+    try {
+      final dataService = DataService();
+      final fetchedHabitacionesRecomendadas =
+          await dataService.fetchAllRoomsRecommended('USER_ID');
+      setState(() {
+        habitacionesRecomendadas = fetchedHabitacionesRecomendadas;
+      });
+    } catch (e) {
+      // Manejo de errores
+      print('Error fetching habitaciones recomendadas: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +117,7 @@ class _HomePageState extends State<HomePage> {
           const Padding(
             padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
             child: Text(
-              "Find and Book",
+              "Encuentra y reserva!",
               style: TextStyle(
                 color: AppColor.labelColor,
                 fontSize: 14,
@@ -103,7 +127,7 @@ class _HomePageState extends State<HomePage> {
           const Padding(
             padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
             child: Text(
-              "The Best Hotel Rooms",
+              "Las Mejores Habitaciones",
               style: TextStyle(
                 color: AppColor.textColor,
                 fontWeight: FontWeight.w600,
@@ -118,7 +142,7 @@ class _HomePageState extends State<HomePage> {
           const Padding(
             padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
             child: Text(
-              "Featured",
+              "Destacadas",
               style: TextStyle(
                 color: AppColor.textColor,
                 fontWeight: FontWeight.w500,
@@ -136,20 +160,14 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  "Recommended",
+                  "Recomendaciones",
                   style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
                       color: AppColor.textColor),
                 ),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ExploreScreen()),
-                    );
-                  },
+                  onTap: () {},
                   child: const Text(
                     "See all",
                     style: TextStyle(fontSize: 14, color: AppColor.darker),
@@ -165,6 +183,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   _buildFeatured() {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return CarouselSlider(
       options: CarouselOptions(
         height: 300,
@@ -172,35 +194,31 @@ class _HomePageState extends State<HomePage> {
         disableCenter: true,
         viewportFraction: .75,
       ),
-      items: List.generate(
-        features.length,
-        (index) => FeatureItem(
-          data: features[index],
-          onTapFavorite: () {
-            setState(() {
-              features[index]["is_favorited"] =
-                  !features[index]["is_favorited"];
-            });
-          },
-        ),
-      ),
+      items: habitaciones.map((habitacion) {
+        return FeatureItem(
+          habitacion: habitacion,
+        );
+      }).toList(),
     );
   }
 
   _getRecommend() {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(15, 5, 0, 5),
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: List.generate(
-          recommends.length,
-          (index) => Padding(
+        children: habitacionesRecomendadas.map((habitacion) {
+          return Padding(
             padding: const EdgeInsets.only(right: 10),
             child: RecommendItem(
-              data: recommends[index],
+              habitacion: habitacion,
             ),
-          ),
-        ),
+          );
+        }).toList(),
       ),
     );
   }

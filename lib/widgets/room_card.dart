@@ -1,25 +1,14 @@
-// lib/widgets/room_card.dart
-
 import 'package:flutter/material.dart';
 import 'package:hotel_app/screens/room.dart';
 import 'package:hotel_app/theme/color.dart';
+import 'package:hotel_app/utils/habitacion_class.dart';
 
 class RoomCard extends StatelessWidget {
-  final String imageUrl;
-  final String title;
-  final String subtitle;
-  final String location;
-  final String price;
-  final double rating;
+  final Habitacion habitacion;
 
   const RoomCard({
     super.key,
-    required this.imageUrl,
-    required this.title,
-    required this.subtitle,
-    required this.location,
-    required this.price,
-    required this.rating,
+    required this.habitacion,
   });
 
   @override
@@ -28,7 +17,8 @@ class RoomCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const RoomPage()),
+          MaterialPageRoute(
+              builder: (context) => RoomPage(habitacion: habitacion)),
         );
       },
       child: Container(
@@ -36,8 +26,9 @@ class RoomCard extends StatelessWidget {
         height: 250,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.0),
-          image: DecorationImage(
-            image: AssetImage(imageUrl),
+          image: const DecorationImage(
+            image: AssetImage('assets/images/familiar.jpeg'),
+            // image: NetworkImage(habitacion.imageUrl),
             fit: BoxFit.cover,
           ),
           boxShadow: [
@@ -69,14 +60,14 @@ class RoomCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        title,
+                        habitacion.type,
                         style: const TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        subtitle,
+                        habitacion.description,
                         style: TextStyle(
                           fontSize: 14.0,
                           color: Colors.grey[600],
@@ -91,7 +82,7 @@ class RoomCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4.0),
                           Text(
-                            rating.toString(),
+                            "4.5",
                             style: TextStyle(
                               fontSize: 14.0,
                               color: Colors.grey[600],
@@ -108,7 +99,7 @@ class RoomCard extends StatelessWidget {
               bottom: 16.0,
               right: 16.0,
               child: Text(
-                price,
+                '\$${habitacion.price.toStringAsFixed(2)}/night',
                 style: const TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,

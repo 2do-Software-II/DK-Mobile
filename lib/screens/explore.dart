@@ -1,12 +1,13 @@
-// lib/screens/explore_screen.dart
-
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
 import 'package:hotel_app/widgets/room_card.dart';
+import 'package:hotel_app/utils/habitacion_class.dart';
 
 class ExploreScreen extends StatefulWidget {
-  const ExploreScreen({super.key});
+  final List<Habitacion> habitaciones;
+
+  const ExploreScreen({super.key, required this.habitaciones});
 
   @override
   _ExploreScreenState createState() => _ExploreScreenState();
@@ -98,27 +99,20 @@ class _ExploreScreenState extends State<ExploreScreen> {
           ),
           const SizedBox(height: 16.0),
           Expanded(
-            child: ListView(
+            child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              children: const [
-                RoomCard(
-                  imageUrl: "assets/images/simple.jpeg",
-                  title: "Twin Room",
-                  subtitle: "Double Room",
-                  location: "Phnom Penh",
-                  price: "\$190/night",
-                  rating: 4.5,
-                ),
-                SizedBox(height: 16.0),
-                RoomCard(
-                  imageUrl: "assets/images/doble.jpeg",
-                  title: "Superior Room",
-                  subtitle: "Double Room",
-                  location: "Phnom Penh",
-                  price: "\$250/night",
-                  rating: 4.8,
-                ),
-              ],
+              itemCount: widget.habitaciones.length,
+              itemBuilder: (context, index) {
+                final habitacion = widget.habitaciones[index];
+                return Column(
+                  children: [
+                    RoomCard(
+                      habitacion: habitacion,
+                    ),
+                    const SizedBox(height: 16.0),
+                  ],
+                );
+              },
             ),
           ),
         ],

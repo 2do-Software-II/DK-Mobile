@@ -1,17 +1,16 @@
-// ignore_for_file: prefer_typing_uninitialized_variables
-
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:hotel_app/screens/room.dart';
 import 'package:hotel_app/theme/color.dart';
-import 'custom_image.dart';
+import 'package:hotel_app/utils/habitacion_class.dart';
 
 class RecommendItem extends StatelessWidget {
   const RecommendItem({
     super.key,
-    required this.data,
+    required this.habitacion,
   });
 
-  final data;
+  final Habitacion habitacion;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +18,8 @@ class RecommendItem extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const RoomPage()),
+          MaterialPageRoute(
+              builder: (context) => RoomPage(habitacion: habitacion)),
         );
       },
       child: Container(
@@ -34,7 +34,7 @@ class RecommendItem extends StatelessWidget {
               color: Colors.grey.withOpacity(0.1),
               spreadRadius: 1,
               blurRadius: 1,
-              offset: const Offset(1, 1), // changes position of shadow
+              offset: const Offset(1, 1),
             ),
           ],
         ),
@@ -58,7 +58,7 @@ class RecommendItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          data["name"],
+          habitacion.type,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
@@ -71,7 +71,7 @@ class RecommendItem extends StatelessWidget {
           height: 5,
         ),
         Text(
-          data["type"],
+          habitacion.status,
           style: const TextStyle(
             fontSize: 12,
             color: AppColor.labelColor,
@@ -96,14 +96,14 @@ class RecommendItem extends StatelessWidget {
         const SizedBox(
           width: 3,
         ),
-        Expanded(
+        const Expanded(
           child: Text(
-            data["rate"],
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            "4.5",
+            style: TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ),
         Text(
-          data["price"],
+          '\$${habitacion.price.toStringAsFixed(2)}',
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -115,10 +115,46 @@ class RecommendItem extends StatelessWidget {
   }
 
   Widget _buildImage() {
-    return CustomImage(
-      data["image"],
-      radius: 15,
-      height: 80,
+    if (habitacion.resources.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: habitacion.resources[0].url,
+        placeholder: (context, url) => const BlankImageWidget(),
+        errorWidget: (context, url, error) => const BlankImageWidget(),
+        imageBuilder: (context, imageProvider) => Container(
+          width: 90,
+          height: 90,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            image: DecorationImage(
+              image: imageProvider,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      );
+    } else {
+      return const BlankImageWidget();
+    }
+  }
+}
+
+class BlankImageWidget extends StatelessWidget {
+  const BlankImageWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 90,
+      height: 90,
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: const Icon(
+        Icons.image,
+        color: Colors.grey,
+        size: 50,
+      ),
     );
   }
 }

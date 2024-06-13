@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, unused_import
 
 import 'package:flutter/material.dart';
 import 'package:hotel_app/screens/explore.dart';
@@ -23,13 +23,6 @@ class _RootAppState extends State<RootApp> with TickerProviderStateMixin {
     {
       "icon": "assets/icons/home.svg",
       "page": const HomePage(),
-    },
-    {
-      "icon": "assets/icons/search.svg",
-      "page": Container(
-        alignment: Alignment.center,
-        child: const ExploreScreen(),
-      ),
     },
     {
       "icon": "assets/icons/pin-area.svg",

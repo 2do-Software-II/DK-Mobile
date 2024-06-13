@@ -1,8 +1,16 @@
+// ignore_for_file: prefer_const_constructors
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hotel_app/screens/payment.dart';
+import 'package:hotel_app/utils/habitacion_class.dart';
+import 'package:hotel_app/widgets/feature_item.dart';
 
 class RoomPage extends StatefulWidget {
-  const RoomPage({super.key});
+  final Habitacion habitacion;
+
+  const RoomPage({super.key, required this.habitacion});
 
   @override
   State<RoomPage> createState() => _RoomPageState();
@@ -29,48 +37,30 @@ class _RoomPageState extends State<RoomPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                Image.asset(
-                  'assets/images/doble.jpeg', // Replace with your actual image path
-                  height: 250,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-                const Positioned(
-                  top: 10,
-                  right: 10,
-                  child: Icon(
-                    Icons.favorite,
-                    color: Colors.yellow,
-                    size: 30,
-                  ),
-                ),
-              ],
-            ),
+            _buildImageSlider(),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Twin Room',
-                    style: TextStyle(
+                  Text(
+                    widget.habitacion.type,
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Phnom Penh',
-                    style: TextStyle(
+                  Text(
+                    widget.habitacion.status,
+                    style: const TextStyle(
                       fontSize: 16,
                       color: Colors.grey,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Row(
-                    children: [
+                  Row(
+                    children: const [
                       Icon(Icons.star,
                           color: Color.fromARGB(255, 255, 206, 59), size: 18),
                       SizedBox(width: 4),
@@ -81,7 +71,7 @@ class _RoomPageState extends State<RoomPage> {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    'What they offer',
+                    'Servicios incluidos',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -98,16 +88,16 @@ class _RoomPageState extends State<RoomPage> {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    'Description',
+                    'Descripcion',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document.',
-                    style: TextStyle(
+                  Text(
+                    widget.habitacion.description,
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
@@ -115,7 +105,11 @@ class _RoomPageState extends State<RoomPage> {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        _showConfirmBooking();
+                        if (widget.habitacion.status == 'Disponible') {
+                          _showConfirmBooking();
+                        } else {
+                          _showStatusMessage(widget.habitacion.status);
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.amber,
@@ -123,7 +117,7 @@ class _RoomPageState extends State<RoomPage> {
                             horizontal: 48, vertical: 16),
                         textStyle: const TextStyle(fontSize: 18),
                       ),
-                      child: const Text('Book Now'),
+                      child: const Text('Reserva Ya!'),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -136,23 +130,95 @@ class _RoomPageState extends State<RoomPage> {
     );
   }
 
+  void _showStatusMessage(String status) {
+    String message;
+    switch (status) {
+      case 'Ocupado':
+        message = 'La habitación está ocupada.';
+        break;
+      case 'Mantenimiento':
+        message = 'La habitación está en mantenimiento.';
+        break;
+      case 'En limpieza':
+        message = 'La habitación está en limpieza.';
+        break;
+      default:
+        message = 'La habitación no está disponible.';
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Estado de la Habitación'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildImageSlider() {
+    return SizedBox(
+      height: 250,
+      child: PageView.builder(
+        itemCount: widget.habitacion.resources.length,
+        itemBuilder: (context, index) {
+          return CachedNetworkImage(
+            imageUrl: widget.habitacion.resources[index].url,
+            placeholder: (context, url) => const BlankImageWidget(),
+            errorWidget: (context, url, error) => const BlankImageWidget(),
+            imageBuilder: (context, imageProvider) => Container(
+              width: double.infinity,
+              height: 250,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   _showConfirmBooking() {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
-        message: const Text("Would you like to book this room?"),
+        message: const Text("Desea reservar esta habitacion?"),
         actions: [
           CupertinoActionSheetAction(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentPage(
+                    habitacion: widget.habitacion,
+                    amount: widget.habitacion.price,
+                  ),
+                ),
+              );
+            },
             child: const Text(
-              "Yes",
+              "SI",
               style:
                   TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
             ),
           )
         ],
         cancelButton: CupertinoActionSheetAction(
-          child: const Text("No"),
+          child: const Text("NO"),
           onPressed: () {
             Navigator.of(context).pop();
           },
