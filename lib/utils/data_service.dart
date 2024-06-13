@@ -1,6 +1,10 @@
+// ignore_for_file: avoid_print
+
+import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:hotel_app/utils/customer_class.dart';
 import 'package:hotel_app/utils/habitacion_class.dart';
-import 'package:hotel_app/utils/reserva_class.dart'; // Importa la clase Reserva
+import 'package:hotel_app/utils/reserva_class.dart';
 
 class DataService {
   final GraphQLClient _client;
@@ -81,26 +85,41 @@ class DataService {
   }
 
   static const String updateRoomStatusMutation = """
-    mutation MyMutation(\$id: ID!) {
-      updateRoom(id: \$id, updateRoomDto: {status: "Ocupado"}) {
+    mutation UpdateRoomStatus(\$id: ID!, \$status: String!) {
+      updateRoom(id: \$id, updateRoomDto: {status: \$status}) {
         id
         status
       }
     }
   """;
 
-  Future<void> updateRoomStatus(String roomId) async {
+  Future<void> updateRoomStatus(String roomId, String status) async {
     final MutationOptions options = MutationOptions(
       document: gql(updateRoomStatusMutation),
       variables: {
         'id': roomId,
+        'status': status,
       },
     );
 
     final QueryResult result = await _client.mutate(options);
 
     if (result.hasException) {
+      if (result.exception?.graphqlErrors != null) {
+        for (var error in result.exception!.graphqlErrors) {
+          print('GraphQL Error: ${error.message}');
+        }
+      }
+      if (result.exception?.linkException != null) {
+        print('Link Exception: ${result.exception!.linkException}');
+      }
       throw Exception(result.exception.toString());
+    }
+
+    if (result.data != null) {
+      final updatedRoom = result.data!['updateRoom'];
+      print(
+          'Room updated: ${updatedRoom['id']}, status: ${updatedRoom['status']}');
     }
   }
 
@@ -135,5 +154,64 @@ class DataService {
 
     final List<dynamic> data = result.data?['getAllBookingsBy'] ?? [];
     return data.map((booking) => Reserva.fromJson(booking)).toList();
+  }
+
+  Future<void> createCustomer(Customer customer, BuildContext context) async {
+    const String mutation = r'''
+      mutation MyMutation(
+        $name: String!,
+        $lastName: String!,
+        $phone: String!,
+        $ci: String!,
+        $expedition: String!,
+        $birthDate: String!,
+        $nationality: String!,
+        $gender: String!,
+        $preference: String!,
+        $user: String!,
+        $address: String!
+      ) {
+        createCustomer(
+          createCustomerDto: {
+            name: $name,
+            lastName: $lastName,
+            phone: $phone,
+            ci: $ci,
+            expedition: $expedition,
+            birthDate: $birthDate,
+            nationality: $nationality,
+            gender: $gender,
+            preference: $preference,
+            user: $user,
+            address: $address
+          }
+        ) {
+          id
+        }
+      }
+    ''';
+
+    final MutationOptions options = MutationOptions(
+      document: gql(mutation),
+      variables: {
+        'name': customer.name,
+        'lastName': customer.lastName,
+        'phone': customer.phone,
+        'ci': customer.ci,
+        'expedition': customer.expedition,
+        'birthDate': customer.birthDate,
+        'nationality': customer.nationality,
+        'gender': customer.gender,
+        'preference': customer.preference,
+        'user': customer.id,
+        'address': customer.address,
+      },
+    );
+
+    final QueryResult result = await _client.mutate(options);
+
+    if (result.hasException) {
+      throw Exception(result.exception.toString());
+    }
   }
 }

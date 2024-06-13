@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'dart:developer';
 import 'package:flutter/material.dart';
@@ -70,20 +70,21 @@ class PaymentPage extends StatelessWidget {
                     note: "Contactanos para cualquier duda sobre su compra.",
                     onSuccess: (Map params) async {
                       log("onSuccess: $params");
-                      try {
-                        await dataService.updateRoomStatus(habitacion.id);
-                        _showAlertAndNavigate(context, "Pago exitoso",
-                            "Su pago ha sido exitoso.", Colors.green);
-                      } catch (e) {
-                        log("Error updating room status: ${e.toString()}");
-                        _showAlertAndNavigate(
-                            context,
-                            "Error",
-                            "Hubo un error actualizando el estado de la habitación.",
-                            Colors.red);
-                      }
-                      // _showAlertAndNavigate(context, "Pago exitoso",
-                      //     "Su pago ha sido exitoso.", Colors.green);
+                      // try {
+                      //   await dataService.updateRoomStatus(
+                      //       habitacion.id, 'Ocupado');
+                      //   _showAlertAndNavigate(context, "Pago exitoso",
+                      //       "Su pago ha sido exitoso.", Colors.green);
+                      // } catch (e) {
+                      //   log("Error updating room status: ${e.toString()}");
+                      //   _showAlertAndNavigate(
+                      //       context,
+                      //       "Error",
+                      //       "Hubo un error actualizando el estado de la habitación.",
+                      //       Colors.red);
+                      // }
+                      _showAlertAndNavigate(context, "Pago exitoso",
+                          "Su pago ha sido exitoso.", Colors.green);
                     },
                     onError: (error) {
                       log("onError: $error");

@@ -3,7 +3,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hotel_app/screens/home.dart';
 import 'package:hotel_app/screens/payment.dart';
 import 'package:hotel_app/screens/root_app.dart';
 import 'package:hotel_app/utils/habitacion_class.dart';
@@ -208,6 +207,7 @@ class _RoomPageState extends State<RoomPage> {
         actions: [
           CupertinoActionSheetAction(
             onPressed: () {
+              //REDIRIGIR AL FORMULARIO PARA INGRESAR LA RESERVA Y DESPUES A PAYPAL
               Navigator.push(
                 context,
                 MaterialPageRoute(
