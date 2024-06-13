@@ -6,9 +6,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hotel_app/screens/login.dart';
 import 'package:hotel_app/theme/color.dart';
 import 'package:hotel_app/utils/data.dart';
+import 'package:hotel_app/utils/user_class.dart';
 import 'package:hotel_app/widgets/icon_box.dart';
 import 'package:hotel_app/widgets/setting_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -18,6 +20,24 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
+  late Future<User?> _userFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _userFuture = _getUser();
+  }
+
+  Future<User?> _getUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userJson = prefs.getString('user');
+    if (userJson != null) {
+      Map<String, dynamic> userMap = jsonDecode(userJson);
+      return User.fromJson(userMap);
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,41 +134,55 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   Widget _buildProfile() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20),
-      child: Column(
-        children: <Widget>[
-          ClipOval(
-            child: Image.network(
-              profile["image"]!,
-              width: 80,
-              height: 80,
-              fit: BoxFit.cover,
+    return FutureBuilder<User?>(
+      future: _userFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return const Text('Error al cargar el perfil');
+        } else if (!snapshot.hasData || snapshot.data == null) {
+          return const Text('No se encontró el usuario');
+        } else {
+          User user = snapshot.data!;
+          return Padding(
+            padding: const EdgeInsets.only(left: 20),
+            child: Column(
+              children: <Widget>[
+                ClipOval(
+                  child: Image.network(
+                    profile["image"]!,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                Text(
+                  user.email,
+                  style: const TextStyle(
+                    color: AppColor.textColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                const Text(
+                  "Bienvenido",
+                  style: TextStyle(
+                    color: AppColor.labelColor,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(
-            height: 12,
-          ),
-          const Text(
-            "Goku",
-            style: TextStyle(
-              color: AppColor.textColor,
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          const Text(
-            "+12 345 6789",
-            style: TextStyle(
-              color: AppColor.labelColor,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
+          );
+        }
+      },
     );
   }
 
@@ -156,13 +190,14 @@ class _SettingPageState extends State<SettingPage> {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
-        message: const Text("Le gustaria cerrar sesion?"),
+        message: const Text("Le gustaría cerrar sesión?"),
         actions: [
           CupertinoActionSheetAction(
             onPressed: () async {
               // Eliminar el token del usuario
               SharedPreferences prefs = await SharedPreferences.getInstance();
               await prefs.remove('token');
+              await prefs.remove('user');
 
               // Redirigir a la página de login sin posibilidad de volver atrás
               Navigator.of(context).pushAndRemoveUntil(

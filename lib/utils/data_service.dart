@@ -81,9 +81,10 @@ class DataService {
   }
 
   static const String updateRoomStatusMutation = """
-    mutation UpdateRoomStatus(\$id: ID!) {
-      updateRoom(updateRoomDto: {status: "Ocupado"}, id: \$id) {
+    mutation MyMutation(\$id: ID!) {
+      updateRoom(id: \$id, updateRoomDto: {status: "Ocupado"}) {
         id
+        status
       }
     }
   """;

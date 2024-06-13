@@ -3,7 +3,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hotel_app/screens/home.dart';
 import 'package:hotel_app/screens/payment.dart';
+import 'package:hotel_app/screens/root_app.dart';
 import 'package:hotel_app/utils/habitacion_class.dart';
 import 'package:hotel_app/widgets/feature_item.dart';
 
@@ -24,7 +26,13 @@ class _RoomPageState extends State<RoomPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            // Navigator.pop(context);
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => RootApp(),
+              ),
+              (Route<dynamic> route) => false,
+            );
           },
         ),
         actions: const [
@@ -52,7 +60,7 @@ class _RoomPageState extends State<RoomPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    widget.habitacion.status,
+                    'Estado: ${widget.habitacion.status}',
                     style: const TextStyle(
                       fontSize: 16,
                       color: Colors.grey,
