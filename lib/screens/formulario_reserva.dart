@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hotel_app/screens/payment.dart';
 import 'package:hotel_app/utils/data_service.dart';
 import 'package:hotel_app/utils/habitacion_class.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BookingFormScreen extends StatefulWidget {
   final Habitacion habitacion;
@@ -15,19 +16,42 @@ class BookingFormScreen extends StatefulWidget {
 }
 
 class _BookingFormScreenState extends State<BookingFormScreen> {
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _timeController = TextEditingController();
   final TextEditingController _paymentMethodController =
       TextEditingController();
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
-  final TextEditingController _customerIdController = TextEditingController();
   final TextEditingController _statusController = TextEditingController();
-  final TextEditingController _fullPaymentController = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final DataService _dataService = DataService();
+
+  String _customerId = '';
+  String _date = '';
+  String _time = '';
+  double _fullPayment = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
+    // Obtener fecha y hora actuales
+    DateTime now = DateTime.now();
+    _date = '${now.year}-${now.month}-${now.day}';
+    _time = '${now.hour}:${now.minute}';
+
+    // Obtener el ID del cliente desde SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _customerId = prefs.getString('customer_id') ?? '';
+
+    // Precio total es el precio de la habitación
+    _fullPayment = widget.habitacion.price;
+
+    setState(() {}); // Actualizar la interfaz después de obtener los datos
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,26 +69,6 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                 title: Text('Tipo de Habitación: ${widget.habitacion.type}'),
                 subtitle: Text(
                     'Precio por Noche: \$${widget.habitacion.price.toStringAsFixed(2)}'),
-              ),
-              TextFormField(
-                controller: _dateController,
-                decoration: const InputDecoration(labelText: 'Fecha'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Ingrese la fecha';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _timeController,
-                decoration: const InputDecoration(labelText: 'Hora'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Ingrese la hora';
-                  }
-                  return null;
-                },
               ),
               TextFormField(
                 controller: _paymentMethodController,
@@ -97,31 +101,11 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                 },
               ),
               TextFormField(
-                controller: _customerIdController,
-                decoration: const InputDecoration(labelText: 'ID del Cliente'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Ingrese el ID del cliente';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
                 controller: _statusController,
                 decoration: const InputDecoration(labelText: 'Estado'),
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Ingrese el estado';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _fullPaymentController,
-                decoration: const InputDecoration(labelText: 'Pago Total'),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Ingrese el pago total';
                   }
                   return null;
                 },
@@ -145,15 +129,14 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   Future<void> _navigateToPaymentPage() async {
     if (_formKey.currentState!.validate()) {
       try {
-        // Obtener los datos del formulario
-        String date = _dateController.text;
-        String time = _timeController.text;
+        String date = _date;
+        String time = _time;
         String paymentMethod = _paymentMethodController.text;
         String startDate = _startDateController.text;
         String endDate = _endDateController.text;
-        String customerId = _customerIdController.text;
+        String customerId = _customerId;
         String status = _statusController.text;
-        double fullPayment = double.parse(_fullPaymentController.text);
+        double fullPayment = _fullPayment;
 
         // Ejecutar la mutación para crear la reserva
         await _dataService.createBooking(
