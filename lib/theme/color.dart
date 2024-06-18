@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, prefer_interpolation_to_compose_strings, unused_local_variable
 
 import 'dart:convert';
 
@@ -97,58 +97,58 @@ Future<void> createBookiing(
 }
 
 //  GET
-// Future<void> createBooking(
-//   String date,
-//   String time,
-//   String paymentMethod,
-//   String startDate,
-//   String endDate,
-//   String customer,
-//   String room,
-//   String status,
-//   double fullPayment,
-// ) async {
-//   final queryParameters = {
-//     'date': date,
-//     'time': time,
-//     'checkIn': "",
-//     'checkOut': "",
-//     'paymentMethod': paymentMethod,
-//     'startDate': startDate,
-//     'endDate': endDate,
-//     'customer': customer,
-//     'room': room,
-//     'status': status,
-//     'fullPayment': fullPayment.toString(),
-//   };
+Future<void> createBoooking(
+  String date,
+  String time,
+  String paymentMethod,
+  String startDate,
+  String endDate,
+  String customer,
+  String room,
+  String status,
+  double fullPayment,
+) async {
+  final queryParameters = {
+    'startDate': startDate,
+    'endDate': endDate,
+    'fullPayment': fullPayment.toString(),
+  };
 
-//   final uri = Uri.https(
-//     'jv-gateway-production.up.railway.app',
-//     '/test/booking',
-//     queryParameters,
-//   );
+  final url = 'https://jv-gateway-production.up.railway.app/test/booking/' +
+      room +
+      '/' +
+      customer +
+      '?startDate=' +
+      startDate +
+      '&endDate=' +
+      endDate +
+      '&fullPayment=' +
+      fullPayment.toString();
 
-//   print("Enviando datos...");
-//   print(uri);
+  print("Enviando datos...");
 
-//   var response = await http.get(uri);
+  var response = await http.get(
+    Uri.parse(url),
+  );
 
-//   print("Datos enviados!");
-//   print("Cuerpo de la respuesta:");
-//   print(response.body);
+  print("Datos enviados!");
+  print(url);
+  print("Cuerpo de la respuesta:");
+  print(response.body);
+  print(response.statusCode);
 
-//   if (response.statusCode == 200) {
-//     if (response.body.isNotEmpty) {
-//       try {
-//         var jsonResponse = jsonDecode(response.body);
-//         print(jsonResponse);
-//       } catch (e) {
-//         print('Error al decodificar la respuesta JSON: $e');
-//       }
-//     } else {
-//       print('La respuesta está vacía.');
-//     }
-//   } else {
-//     print('Error en la respuesta del servidor: ${response.statusCode}');
-//   }
-// }
+  if (response.statusCode == 200) {
+    if (response.body.isNotEmpty) {
+      try {
+        var jsonResponse = jsonDecode(response.body);
+        print(jsonResponse);
+      } catch (e) {
+        print('Error al decodificar la respuesta JSON: $e');
+      }
+    } else {
+      print('La respuesta está vacía.');
+    }
+  } else {
+    print('Error en la respuesta del servidor: ${response.statusCode}');
+  }
+}

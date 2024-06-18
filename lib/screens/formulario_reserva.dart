@@ -143,7 +143,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
         "status: $_statusController,\n");
     print(widget.habitacion.id);
     if (_formKey.currentState!.validate()) {
-      await createBookiing(
+      await createBoooking(
           _date,
           _time,
           _paymentMethodController.text,
