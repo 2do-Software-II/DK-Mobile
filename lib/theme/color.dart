@@ -1,4 +1,9 @@
+// ignore_for_file: avoid_print
+
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class AppColor {
   static const primary = Color(0xFFe6b56c);
@@ -43,3 +48,107 @@ class AppColor {
     yellow,
   ];
 }
+
+Future<void> createBookiing(
+  String date,
+  String time,
+  String paymentMethod,
+  String startDate,
+  String endDate,
+  String customer,
+  String room,
+  String status,
+  double fullPayment,
+) async {
+  final Map<String, dynamic> body = {
+    'date': date,
+    'time': time,
+    'checkIn': "",
+    'checkOut': "",
+    'paymentMethod': paymentMethod,
+    'startDate': startDate,
+    'endeDate': endDate,
+    'customer': customer,
+    'room': room,
+    'status': status,
+    'fullPayment': fullPayment,
+  };
+  print(body);
+  print("Enviando datos...");
+  var response = await http.post(
+    Uri.parse('https://jv-gateway-production.up.railway.app/test/booking'),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode(body),
+  );
+  print("Datos enviados!");
+  print(response.body);
+  if (response.statusCode == 200) {
+    try {
+      var jsonResponse = jsonDecode(response.body);
+      print(jsonResponse);
+    } catch (e) {
+      print('Error al decodificar la respuesta JSON: $e');
+    }
+  } else {
+    print('Error en la respuesta del servidor: ${response.statusCode}');
+  }
+}
+
+//  GET
+// Future<void> createBooking(
+//   String date,
+//   String time,
+//   String paymentMethod,
+//   String startDate,
+//   String endDate,
+//   String customer,
+//   String room,
+//   String status,
+//   double fullPayment,
+// ) async {
+//   final queryParameters = {
+//     'date': date,
+//     'time': time,
+//     'checkIn': "",
+//     'checkOut': "",
+//     'paymentMethod': paymentMethod,
+//     'startDate': startDate,
+//     'endDate': endDate,
+//     'customer': customer,
+//     'room': room,
+//     'status': status,
+//     'fullPayment': fullPayment.toString(),
+//   };
+
+//   final uri = Uri.https(
+//     'jv-gateway-production.up.railway.app',
+//     '/test/booking',
+//     queryParameters,
+//   );
+
+//   print("Enviando datos...");
+//   print(uri);
+
+//   var response = await http.get(uri);
+
+//   print("Datos enviados!");
+//   print("Cuerpo de la respuesta:");
+//   print(response.body);
+
+//   if (response.statusCode == 200) {
+//     if (response.body.isNotEmpty) {
+//       try {
+//         var jsonResponse = jsonDecode(response.body);
+//         print(jsonResponse);
+//       } catch (e) {
+//         print('Error al decodificar la respuesta JSON: $e');
+//       }
+//     } else {
+//       print('La respuesta está vacía.');
+//     }
+//   } else {
+//     print('Error en la respuesta del servidor: ${response.statusCode}');
+//   }
+// }

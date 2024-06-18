@@ -1,7 +1,10 @@
 // ignore_for_file: library_private_types_in_public_api, unused_field, use_build_context_synchronously, avoid_print
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:hotel_app/screens/payment.dart';
+import 'package:hotel_app/theme/color.dart';
 import 'package:hotel_app/utils/data_service.dart';
 import 'package:hotel_app/utils/habitacion_class.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,17 +43,21 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   Future<void> _loadInitialData() async {
     // Obtener fecha y hora actuales
     DateTime now = DateTime.now();
-    _date = '${now.year}-${now.month}-${now.day}';
+    _date = '${now.day}/${now.month}/${now.year}';
     _time = '${now.hour}:${now.minute}';
 
-    // Obtener el ID del cliente desde SharedPreferences
+    // Obtener el customer_id desde SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _customerId = prefs.getString('customer_id') ?? '';
+    String? customerJson = prefs.getString('customer');
 
-    // Precio total es el precio de la habitación
+    if (customerJson != null) {
+      Map<String, dynamic> customerMap = jsonDecode(customerJson);
+      _customerId = customerMap['id'] ?? '';
+    }
+
     _fullPayment = widget.habitacion.price;
 
-    setState(() {}); // Actualizar la interfaz después de obtener los datos
+    setState(() {});
   }
 
   @override
@@ -127,41 +134,34 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   }
 
   Future<void> _navigateToPaymentPage() async {
+    print("date: $_date,\n"
+        "time: $_time,\n"
+        "paymentMethod: $_paymentMethodController,\n"
+        "startDate: $_startDateController,\n"
+        "endDate: $_endDateController,\n"
+        "customerId: $_customerId,\n"
+        "status: $_statusController,\n");
+    print(widget.habitacion.id);
     if (_formKey.currentState!.validate()) {
-      try {
-        String date = _date;
-        String time = _time;
-        String paymentMethod = _paymentMethodController.text;
-        String startDate = _startDateController.text;
-        String endDate = _endDateController.text;
-        String customerId = _customerId;
-        String status = _statusController.text;
-        double fullPayment = _fullPayment;
-
-        // Ejecutar la mutación para crear la reserva
-        await _dataService.createBooking(
-          date,
-          time,
-          paymentMethod,
-          startDate,
-          endDate,
-          customerId,
+      await createBookiing(
+          _date,
+          _time,
+          _paymentMethodController.text,
+          _startDateController.text,
+          _endDateController.text,
+          _customerId,
           widget.habitacion.id,
-          status,
-          fullPayment,
-        );
-
-        await Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) => PaymentPage(
-            amount: widget.habitacion.price,
-            habitacion: widget.habitacion,
-          ),
-        ));
-      } catch (e) {
-        print(
-            'Error al ejecutar la mutación y navegar a la pantalla de pago: $e');
-        // Manejar el error según tus necesidades (mostrar mensaje al usuario, etc.)
-      }
+          _statusController.text,
+          _fullPayment);
+      print("Reserva creada!");
+      await Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => PaymentPage(
+          amount: widget.habitacion.price,
+          habitacion: widget.habitacion,
+        ),
+      ));
+    } else {
+      print("Error al validar el formulario");
     }
   }
 }

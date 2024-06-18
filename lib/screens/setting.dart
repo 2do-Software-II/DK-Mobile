@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hotel_app/screens/login.dart';
+import 'package:hotel_app/screens/reservas.dart';
 import 'package:hotel_app/theme/color.dart';
 import 'package:hotel_app/utils/data.dart';
 import 'package:hotel_app/utils/user_class.dart';
@@ -21,6 +22,7 @@ class SettingPage extends StatefulWidget {
 
 class _SettingPageState extends State<SettingPage> {
   late Future<User?> _userFuture;
+  String _customerId = '';
 
   @override
   void initState() {
@@ -31,6 +33,12 @@ class _SettingPageState extends State<SettingPage> {
   Future<User?> _getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userJson = prefs.getString('user');
+    String? customerJson = prefs.getString('customer');
+
+    if (customerJson != null) {
+      Map<String, dynamic> customerMap = jsonDecode(customerJson);
+      _customerId = customerMap['id'] ?? '';
+    }
     if (userJson != null) {
       Map<String, dynamic> userMap = jsonDecode(userJson);
       return User.fromJson(userMap);
@@ -101,10 +109,20 @@ class _SettingPageState extends State<SettingPage> {
             leadingIconColor: AppColor.orange,
           ),
           const SizedBox(height: 10),
-          const SettingItem(
+          SettingItem(
             title: "Reservas",
             leadingIcon: Icons.bookmark_border,
             leadingIconColor: AppColor.blue,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyBookingsScreen(
+                    customerId: _customerId,
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 10),
           const SettingItem(

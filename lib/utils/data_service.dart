@@ -221,20 +221,21 @@ class DataService {
     String paymentMethod,
     String startDate,
     String endDate,
-    String customerId,
-    String roomId,
+    String customer,
+    String room,
     String status,
     double fullPayment,
   ) async {
-    const String mutation = r'''
-    mutation CreateBooking(
+    try {
+      const String mutation = r'''
+    mutation MyMutation(
       $date: String!,
       $time: String!,
       $paymentMethod: String!,
       $startDate: String!,
       $endDate: String!,
-      $customerId: String!,
-      $roomId: String!,
+      $customer: String!,
+      $room: String!,
       $status: String!,
       $fullPayment: Float!
     ) {
@@ -242,11 +243,13 @@ class DataService {
         createBookingDto: {
           date: $date,
           time: $time,
+          checkIn: "",
+          checkOut: "",
           paymentMethod: $paymentMethod,
           startDate: $startDate,
           endDate: $endDate,
-          customer: $customerId,
-          room: $roomId,
+          customer: $customer,
+          room: $room,
           status: $status,
           fullPayment: $fullPayment
         }
@@ -268,25 +271,68 @@ class DataService {
     }
   ''';
 
-    final MutationOptions options = MutationOptions(
-      document: gql(mutation),
+      final MutationOptions options = MutationOptions(
+        document: gql(mutation),
+        variables: {
+          'date': date,
+          'time': time,
+          'paymentMethod': paymentMethod,
+          'startDate': startDate,
+          'endDate': endDate,
+          'customer': customer,
+          'room': room,
+          'status': status,
+          'fullPayment': fullPayment,
+        },
+      );
+      print(mutation);
+      print(options);
+      final QueryResult result = await _client.mutate(options);
+      print(result);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static const String getAllBookingsByQuery = r'''
+    query MyQuery($attr: String!, $value: String!) {
+      getAllBookingsBy(attr: $attr, value: $value) {
+        customer {
+          id
+        }
+        checkIn
+        checkOut
+        date
+        endDate
+        fullPayment
+        paymentMethod
+        prePaid
+        room {
+          description
+        }
+        startDate
+        status
+        time
+      }
+    }
+  ''';
+
+  Future<List<Reserva>> getAllBookingsBy(String attribute, String value) async {
+    final QueryOptions options = QueryOptions(
+      document: gql(getAllBookingsByQuery),
       variables: {
-        'date': date,
-        'time': time,
-        'paymentMethod': paymentMethod,
-        'startDate': startDate,
-        'endDate': endDate,
-        'customerId': customerId,
-        'roomId': roomId,
-        'status': status,
-        'fullPayment': fullPayment,
+        'attr': attribute,
+        'value': value,
       },
     );
 
-    final QueryResult result = await _client.mutate(options);
+    final QueryResult result = await _client.query(options);
 
     if (result.hasException) {
       throw Exception(result.exception.toString());
     }
+
+    final List<dynamic> data = result.data?['getAllBookingsBy'] ?? [];
+    return data.map((booking) => Reserva.fromJson(booking)).toList();
   }
 }
