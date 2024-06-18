@@ -129,6 +129,9 @@ Future<void> createBoooking(
 
   var response = await http.get(
     Uri.parse(url),
+    headers: <String, String>{
+      'Content-Type': 'application/json',
+    },
   );
 
   print("Datos enviados!");

@@ -1,8 +1,8 @@
-// ignore_for_file: use_super_parameters, library_private_types_in_public_api
-
+// ignore_for_file: use_super_parameters, library_private_types_in_public_api, unused_field
 import 'package:flutter/material.dart';
 import 'package:hotel_app/utils/data_service.dart';
 import 'package:hotel_app/utils/reserva_class.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyBookingsScreen extends StatefulWidget {
   final String customerId;
@@ -17,6 +17,7 @@ class MyBookingsScreen extends StatefulWidget {
 class _MyBookingsScreenState extends State<MyBookingsScreen> {
   final DataService _dataService = DataService();
   late Future<List<Reserva>> _bookingsFuture;
+  String _customerId = '';
 
   @override
   void initState() {
@@ -25,8 +26,10 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   }
 
   Future<void> _loadBookings() async {
-    _bookingsFuture =
-        _dataService.getAllBookingsBy('customer', widget.customerId);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _customerId = prefs.getString('customerId')!;
+    _bookingsFuture = _dataService.getAllBookingsBy('customer', _customerId);
+    print(_bookingsFuture);
   }
 
   @override

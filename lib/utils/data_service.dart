@@ -156,7 +156,7 @@ class DataService {
     return data.map((booking) => Reserva.fromJson(booking)).toList();
   }
 
-  Future<void> createCustomer(Customer customer, BuildContext context) async {
+  Future<String> createCustomer(Customer customer, BuildContext context) async {
     const String mutation = r'''
       mutation MyMutation(
         $name: String!,
@@ -213,6 +213,36 @@ class DataService {
     if (result.hasException) {
       throw Exception(result.exception.toString());
     }
+    return result.data!['createCustomer']['id'];
+  }
+
+  Future<String?> fetchCustomerIdByUserId(String userId) async {
+    const String query = r'''
+      query MyQuery($id: String!) {
+        getOneCustomer(id: $id) {
+          user {
+            id
+          }
+        }
+      }
+    ''';
+
+    final QueryOptions options = QueryOptions(
+      document: gql(query),
+      variables: {'id': userId},
+    );
+
+    final QueryResult result = await _client.query(options);
+
+    if (result.hasException) {
+      throw Exception(result.exception.toString());
+    }
+
+    if (result.data != null && result.data!['getOneCustomer'] != null) {
+      return result.data!['getOneCustomer']['user']['id'];
+    }
+
+    return null;
   }
 
   Future<void> createBooking(
@@ -318,6 +348,8 @@ class DataService {
   ''';
 
   Future<List<Reserva>> getAllBookingsBy(String attribute, String value) async {
+    print(attribute);
+    print(value);
     final QueryOptions options = QueryOptions(
       document: gql(getAllBookingsByQuery),
       variables: {

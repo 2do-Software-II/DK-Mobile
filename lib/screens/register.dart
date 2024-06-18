@@ -821,7 +821,12 @@ class Register extends StatelessWidget {
       prefs.setString('user', jsonEncode(newUser.toJson()));
       prefs.setString('customer', jsonEncode(newCustomer.toJson()));
 
-      await DataService().createCustomer(newCustomer, context);
+      var custId = await DataService().createCustomer(newCustomer, context);
+
+      print(custId);
+      print(userId);
+
+      prefs.setString('customerId', custId);
 
       Navigator.pushAndRemoveUntil(
         context,

@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, unused_field, use_build_context_synchronously, avoid_print
+// ignore_for_file: library_private_types_in_public_api, unused_field, use_build_context_synchronously, avoid_print, unused_import
 
 import 'dart:convert';
 
@@ -29,7 +29,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
 
   final DataService _dataService = DataService();
 
-  String _customerId = '';
+  String? _customerId = '';
   String _date = '';
   String _time = '';
   double _fullPayment = 0.0;
@@ -48,12 +48,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
 
     // Obtener el customer_id desde SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? customerJson = prefs.getString('customer');
-
-    if (customerJson != null) {
-      Map<String, dynamic> customerMap = jsonDecode(customerJson);
-      _customerId = customerMap['id'] ?? '';
-    }
+    _customerId = prefs.getString('customerId');
 
     _fullPayment = widget.habitacion.price;
 
@@ -149,7 +144,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
           _paymentMethodController.text,
           _startDateController.text,
           _endDateController.text,
-          _customerId,
+          _customerId!,
           widget.habitacion.id,
           _statusController.text,
           _fullPayment);

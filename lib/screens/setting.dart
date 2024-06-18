@@ -33,12 +33,8 @@ class _SettingPageState extends State<SettingPage> {
   Future<User?> _getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userJson = prefs.getString('user');
-    String? customerJson = prefs.getString('customer');
+    _customerId = prefs.getString('customerId')!;
 
-    if (customerJson != null) {
-      Map<String, dynamic> customerMap = jsonDecode(customerJson);
-      _customerId = customerMap['id'] ?? '';
-    }
     if (userJson != null) {
       Map<String, dynamic> userMap = jsonDecode(userJson);
       return User.fromJson(userMap);
