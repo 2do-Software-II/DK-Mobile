@@ -46,7 +46,9 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No se encontraron reservas.'));
+            return const Center(
+                child: Text(
+                    'Visita la pagina para ver tus reservas con mas detalles.'));
           } else {
             List<Reserva> bookings = snapshot.data!;
             return ListView.builder(
